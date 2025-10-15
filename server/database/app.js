@@ -58,17 +58,49 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
-//Write your code here
+  try {
+    const dealers = await Dealerships.find();  // Get all dealerships
+    res.json(dealers);                         // Send as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching dealerships' });
+  }
 });
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
 //Write your code here
+  try {
+    const stateParam = req.params.state;
+    const dealers = await Dealerships.find({ state: stateParam });
+    
+    if (dealers.length > 0) {
+      res.json(dealers);
+    } else {
+      res.status(404).json({ message: `No dealerships found in state: ${stateParam}` });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching dealerships by state' });
+  }
 });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
 //Write your code here
+  try {
+    const dealerId = parseInt(req.params.id);  // Assuming your dealership "id" is numeric
+    const dealer = await Dealerships.findOne({ id: dealerId });
+
+    if (dealer) {
+      res.json(dealer);
+    } else {
+      res.status(404).json({ message: `Dealer with id ${dealerId} not found.` });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching dealer by id' });
+  }
 });
 
 //Express route to insert review
@@ -102,3 +134,4 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
